@@ -10,7 +10,7 @@ function ENT:Think()
 		if (!self.target || self.hasFoundTarget) then return end
 		local target = ents.FindByName(self.target)	
 		for k,v in ipairs(target) do 
-			self.Entity:SetNWEntity("target",v)
+			self:SetNWEntity("target",v)
 			self.hasFoundTarget = true
 		end
 	else
@@ -22,7 +22,7 @@ end
 
 function ENT:KeyValue(key, value)
 	if key == "modelscale" then
-		self.Entity:SetNWFloat(key,value)
+		self:SetNWFloat(key,value)
 	elseif key == "target" then
 		self.target = value
 	end
@@ -30,8 +30,8 @@ end
 
 
 function ENT:DoScale()
-	local curTarg = self.Entity:GetNWEntity("target",false)
-	local curScale = self.Entity:GetNWFloat("modelscale",false)
+	local curTarg = self:GetNWEntity("target",false)
+	local curScale = self:GetNWFloat("modelscale",false)
 	if (!curTarg || !curScale) then return end
 	self.Sized = true
 	Msg("sizing "..curTarg:GetClass().."\n")

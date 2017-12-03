@@ -4,7 +4,7 @@ ENT.Type = "anim"
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 ENT.PrintName = "Rocket"
 ENT.Spawnable = false
-ENT.AdminSpawnable = false
+ENT.AdminOnly = false
 ENT.iTick = 0;
 if (CLIENT) then 
 Laser = Material( "cable/redlaser" )
@@ -15,16 +15,18 @@ function ENT:Draw()
 	
 	local Vector1 = self:LocalToWorld( Vector( 50000, 50000, 50000 ) )
 	local Vector2 = self:LocalToWorld( Vector( -50000, -50000, -50000 )  )
-	self.Entity:SetRenderBoundsWS( Vector2, Vector1 ) 
+	self:SetRenderBoundsWS( Vector2, Vector1 ) 
 	self:SetRenderBoundsWS( Vector2, Vector1 ) 
 	
 	
 	render.SetMaterial( Laser )
 	render.DrawBeam( Vector1, Vector2, 3, 0, 80, Color( 255, 255, 255, 255 ) ) 
-	
-	self:SetModelScale(Vector(3+(math.sin(CurTime())*2), 3+(math.sin(CurTime())*2), 3+(math.sin(CurTime())*2)))
+
+	local mat = Matrix()
+    mat:Scale(Vector(3+(math.sin(CurTime())*2), 3+(math.sin(CurTime())*2), 3+(math.sin(CurTime())*2)))
+
+	self:EnableMatrix("RenderMultiply", mat)
     self:DrawModel()
-	
 end
 
 function ENT:Initialize()
@@ -45,9 +47,7 @@ function ENT:Initialize()
 	//	self:SetModel( "models/props_junk/watermelon01.mdl" )
 	//end
     if(CLIENT) then 
-		self.Entity:SetRenderBoundsWS( Vector(-90000,-90000,-90000), Vector(90000,90000,90000) )
 		self:SetRenderBoundsWS( Vector(-90000,-90000,-90000), Vector(90000,90000,90000) )
-		self.Entity:SetRenderBounds( Vector(-90000,-90000,-90000), Vector(90000,90000,90000) )
 		self:SetRenderBounds( Vector(-90000,-90000,-90000), Vector(90000,90000,90000) )
 	return 
 	
@@ -61,16 +61,16 @@ function ENT:Initialize()
 	
 	local bloodeffect = ents.Create( "info_particle_system" )
 	bloodeffect:SetKeyValue( "effect_name", "Advisor_Pod_Steam_Continuous" )
-	bloodeffect:SetPos( self.Entity:GetPos()+Vector(-45,0,0) ) 
-	bloodeffect:SetAngles( self.Entity:GetAngles()-Vector(-180,0,0) ) 
+	bloodeffect:SetPos( self:GetPos()+Vector(-45,0,0) ) 
+	bloodeffect:SetAngles( self:GetAngles()-Vector(-180,0,0):Angle() ) 
 	bloodeffect:Spawn()
 	bloodeffect:Activate() 
 	bloodeffect:Fire( "Start", "", 0 )
-	bloodeffect:SetParent(self.Entity)
+	bloodeffect:SetParent(self)
 	/*if (self.Mod == "melon") then
-		self.Trail = util.SpriteTrail(self.Entity, 0, Color(255,255,255), false, 32, 16, 12, 1/(40+1)*0.5, "cunt/_f2.vmt")
+		self.Trail = util.SpriteTrail(self, 0, Color(255,255,255), false, 32, 16, 12, 1/(40+1)*0.5, "cunt/_f2.vmt")
 	else
-		self.Trail = util.SpriteTrail(self.Entity, 0, Color(255,255,255), false, 128, 64, 12, 1/(40+1)*0.5, "cunt/_hello.vmt")
+		self.Trail = util.SpriteTrail(self, 0, Color(255,255,255), false, 128, 64, 12, 1/(40+1)*0.5, "cunt/_hello.vmt")
 	end*/
 	self.LastSound = -1
 end
@@ -79,7 +79,7 @@ function ENT:Think()
     if(CLIENT) then return end
 	self.iTick = self.iTick + 1;
 	if (self.LastThink < CurTime()) then
-		local mypos = self.Entity:GetPos()
+		local mypos = self:GetPos()
 		local closest = -1
 		local closestplayer = nil
 		
@@ -95,7 +95,7 @@ function ENT:Think()
 			end
 		end
 		if (closestplayer == nil) then 
-			self.Entity:Remove() 
+			self:Remove() 
 			return 
 		end
 		if (closestplayer != self.Target) then
@@ -107,18 +107,18 @@ function ENT:Think()
 		
 	end
 	if (self.Target != nil && self.Target:IsValid() && self.Target:IsPlayer()) then
-		local endang = ( (self.Target:GetPos()+Vector(0,0,64)) - self.Entity:GetPos() ):Angle();
+		local endang = ( (self.Target:GetPos()+Vector(0,0,64)) - self:GetPos() ):Angle();
 		
 		endang:RotateAroundAxis(endang:Forward(), self.iTick*2)
-		self.Entity:SetAngles( endang )  
+		self:SetAngles( endang )  
 		
-		local dist = self.Entity:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))
+		local dist = self:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))
 		if (dist  < 50) then
-			local position = self.Entity:GetPos()
+			local position = self:GetPos()
 			local damage = 10000
 			local radius = 128
 			local attacker = self.Target
-			local inflictor = self.Entity
+			local inflictor = self
 			util.BlastDamage(inflictor, attacker, position, radius, damage)
 			
 			local effectdata = EffectData()
@@ -126,46 +126,46 @@ function ENT:Think()
 			effectdata:SetOrigin( position )
 			effectdata:SetScale( 1 )
 			util.Effect( "Explosion", effectdata )	
-			self.Entity:EmitSound("ambient/voices/f_scream1.wav");
-			self.Entity:Remove()
+			self:EmitSound("ambient/voices/f_scream1.wav");
+			self:Remove()
 		end
 	end
-	if (self.Entity:IsValid()) then 
-		self.Entity:SetPos(self.Entity:GetPos() + (self.Entity:GetForward()*4.5))
+	if (self:IsValid()) then 
+		self:SetPos(self:GetPos() + (self:GetForward()*4.5))
 		
 	end
 	
 	if (self.LastSound == -1 or self.LastSound < CurTime()) then
-		if (self.Entity:IsValid()) then
+		if (self:IsValid()) then
 			local pitch = 50
 			
-			local dist = self.Entity:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))
+			local dist = self:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))
 			
 			pitch = 150-(dist/14)
 			//self.LastSound = CurTime() + (dist/100)*0.1
 			self.LastSound = CurTime() + 0.8
 			
-			//self.Entity:EmitSound("npc/roller/mine/rmine_blip3.wav",80,math.Clamp(pitch, 50,150))
+			//self:EmitSound("npc/roller/mine/rmine_blip3.wav",80,math.Clamp(pitch, 50,150))
 			if (self.Mod == "barney") then
-				self.Entity:EmitSound("cunt/barney.wav",80,math.Clamp(pitch, 80,120))
+				self:EmitSound("cunt/barney.wav",80,math.Clamp(pitch, 80,120))
 			elseif (self.Mod == "alyx") then
 				local rand = math.random(1,6) 
-				if (rand == 1) then self.Entity:EmitSound("vo/npc/alyx/hurt04.wav",80,math.Clamp(pitch, 80,120)) end
-				if (rand == 2) then self.Entity:EmitSound("vo/npc/alyx/hurt05.wav",80,math.Clamp(pitch, 80,120)) end
-				if (rand == 3) then self.Entity:EmitSound("vo/npc/alyx/hurt06.wav",80,math.Clamp(pitch, 80,120)) end
-				if (rand == 4) then self.Entity:EmitSound("vo/npc/alyx/hurt08.wav",80,math.Clamp(pitch, 80,120)) end
-				if (rand == 5) then self.Entity:EmitSound("vo/npc/alyx/uggh01.wav",80,math.Clamp(pitch, 80,120)) end
-				if (rand == 6) then self.Entity:EmitSound("vo/npc/alyx/uggh02.wav",80,math.Clamp(pitch, 80,120)) end
+				if (rand == 1) then self:EmitSound("vo/npc/alyx/hurt04.wav",80,math.Clamp(pitch, 80,120)) end
+				if (rand == 2) then self:EmitSound("vo/npc/alyx/hurt05.wav",80,math.Clamp(pitch, 80,120)) end
+				if (rand == 3) then self:EmitSound("vo/npc/alyx/hurt06.wav",80,math.Clamp(pitch, 80,120)) end
+				if (rand == 4) then self:EmitSound("vo/npc/alyx/hurt08.wav",80,math.Clamp(pitch, 80,120)) end
+				if (rand == 5) then self:EmitSound("vo/npc/alyx/uggh01.wav",80,math.Clamp(pitch, 80,120)) end
+				if (rand == 6) then self:EmitSound("vo/npc/alyx/uggh02.wav",80,math.Clamp(pitch, 80,120)) end
 				
 			elseif (self.Mod == "baby") then
-				self.Entity:EmitSound("ambient/creatures/teddy.wav",80,math.Clamp(pitch, 60,140))
+				self:EmitSound("ambient/creatures/teddy.wav",80,math.Clamp(pitch, 60,140))
 			elseif (self.Mod == "melon") then
-				self.Entity:EmitSound("cunt/melon_solo.wav",80,math.Clamp(pitch, 60,140))
+				self:EmitSound("cunt/melon_solo.wav",80,math.Clamp(pitch, 60,140))
 			end
 		end
 	end
 	
-	self.Entity:NextThink(CurTime()+0.025)
+	self:NextThink(CurTime()+0.025)
 	return true
 end
 

@@ -2,10 +2,11 @@ include('shared.lua')
 
 ENT.CurScale = 1;
 
+local mat = Material("jim/melon")
 function ENT:Draw()	
-	if (IsTTTAdmin(LocalPlayer()) && self.Entity:GetNWEntity("spec_owner") == NULL) then
-		render.SetMaterial( Material("jim/melon") )
-		render.DrawSprite( self.Entity:GetPos(), 8, 8, white)
+	if (IsTTTAdmin(LocalPlayer()) && !IsValid(self:GetNWEntity("spec_owner"))) then
+		render.SetMaterial( mat )
+		render.DrawSprite( self:GetPos(), 8, 8, Color(255, 255, 255))
 	end
 	
 	if (self:GetNWEntity("spec_owner") == LocalPlayer()) then 
@@ -14,14 +15,17 @@ function ENT:Draw()
 		self:SetColor(255, 255, 255, 255)
 	end
 	
-	self.Entity:DrawModel()
+	self:DrawModel()
 	
 	local destScale = self:GetNetScale();
 	self.CurScale = destScale
 	local curScale = self.CurScale;
-	
-	self.Entity:SetModelScale( Vector(curScale,curScale,curScale) )	
-	self.Entity:SetRenderBounds(Vector(-curScale,-curScale,-curScale),Vector(curScale,curScale,curScale))
+
+    local mat = Matrix()
+    mat:Scale(Vector(curScale, curScale, curScale))
+
+	self:EnableMatrix("RenderMultiply", mat)
+	self:SetRenderBounds(Vector(-curScale,-curScale,-curScale),Vector(curScale,curScale,curScale))
 end
 
 function ENT:DrawEntityOutline()

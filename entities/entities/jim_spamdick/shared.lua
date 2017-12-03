@@ -13,14 +13,20 @@ ENT.Speed = 0
 ENT.Seed = 0
 function ENT:Draw()
 	local mod = math.sin((self.Seed+CurTime())*4)*4
-	self:SetModelScale(Vector(5+mod ,5+mod , 5+mod ))
+	local mat = Matrix()
+    mat:Scale(Vector(5+mod, 5+mod, 5+mod))
+
+	self:EnableMatrix("RenderMultiply", mat)
     self:DrawModel()
 end
 
 function ENT:Initialize()
 	self.Seed = math.random(1,500)
     if(CLIENT) then 
-	self:SetModelScale(Vector(5, 5, 5))
+    local mat = Matrix()
+    mat:Scale(Vector(5, 5, 5))
+
+	self:EnableMatrix("RenderMultiply", mat)
 	return 
 	end  
 	if (self.Attached) then return end
@@ -39,7 +45,7 @@ function ENT:Initialize()
 	end
 	self.SpawnTime = CurTime()
 	self.Speed = math.random(-1500,-50);
-	self.trail = util.SpriteTrail(self.Entity, 0, Color(140,100,50), false, 6, 0, 8, 1, "trails/smoke.vmt")	
+	self.trail = util.SpriteTrail(self, 0, Color(140,100,50), false, 6, 0, 8, 1, "trails/smoke.vmt")	
 end
 
 function ENT:OnRemove()

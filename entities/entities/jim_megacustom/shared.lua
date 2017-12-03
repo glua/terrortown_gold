@@ -1,23 +1,12 @@
 ENT.Type = "anim"
 ENT.ResizableProp = true
 
-function ENT:GetNetScale()
-	local scale = self.Entity:GetNetworkedFloat( "scale" );
-	if (scale) then return scale end
-	return 1
-end
-
-function ENT:GetResized()
-	return self.Entity:GetNetworkedBool( "resized" )
-end
-
-function ENT:SetResized(set)
-	self.Entity:SetNetworkedBool("resized", set)
-end
-
-function ENT:SetNetScale( scale )
-	self:SetResized(true)
-	self.Entity:SetNetworkedFloat( "scale", scale )
+function ENT:SetupDataTables()
+	self:NetworkVar("Float", 0, "Scale")
+	self:NetworkVar("Float", 1, "NetScale")
+	self:NetworkVar("Bool", 0, "Resized")
+	self:NetworkVar("Vector", 0, "BaseMin")
+	self:NetworkVar("Vector", 1, "BaseMax")
 end
 
 function ENT:ModScale( mod )
@@ -26,18 +15,4 @@ function ENT:ModScale( mod )
 	curScale = curScale+mod
 	curScale = math.Clamp(curScale,0.01,100)
 	self:SetNetScale(curScale);
-end
-
-function ENT:SetBaseMin(vec)
-	self.Entity:SetNetworkedVector( "basemin", vec )
-end
-function ENT:SetBaseMax(vec)
-	self.Entity:SetNetworkedVector( "basemax", vec )
-end
-
-function ENT:GetBaseMin()
-	return self.Entity:GetNetworkedVector( "basemin", false )
-end
-function ENT:GetBaseMax()
-	return self.Entity:GetNetworkedVector( "basemax", false )
 end

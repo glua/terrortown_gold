@@ -1,10 +1,10 @@
-AddCSLuaFile( "shared.lua" )  -- and shared scripts are sent.
+AddCSLuaFile()
 
 ENT.Type = "anim"
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 ENT.PrintName = "Rocket"
 ENT.Spawnable = false
-ENT.AdminSpawnable = false
+ENT.AdminOnly = false
 ENT.trigger = 200 //danger zoneeee
 ENT.pitch = 80
 ENT.active = false
@@ -24,9 +24,9 @@ function ENT:Initialize()
     self:SetSolid( SOLID_VPHYSICS )
     self:PhysicsInit( SOLID_VPHYSICS )
 	
-	phys = self:GetPhysicsObject()
+	local phys = self:GetPhysicsObject()
 	if IsValid(phys) then
-		self:GetPhysicsObject():ApplyForceCenter( Vector( 0, 0, 20 ) )
+		phys:ApplyForceCenter( Vector( 0, 0, 20 ) )
 	end
 	
 	self.activewatch = CurTime() + self.activetime
@@ -39,20 +39,20 @@ function ENT:Think()
 	self:NextThink(CurTime()+.1)
 	
 
-	local mypos = self.Entity:LocalToWorld(self.Entity:OBBCenter( ))
+	local mypos = self.Entity:LocalToWorld(self:OBBCenter( ))
 	local close = false
 			
 	for k, v in pairs(player.GetAll()) do
-		if (v:IsValid() and v:IsPlayer() and v:Alive() and !v:IsSpec()) then
+		if (v:Alive() and !v:IsSpec()) then
 			local ourdist = mypos:Distance(v:GetPos())
 			if (ourdist < self.trigger) then
 				local theirpos = v:LocalToWorld(v:OBBCenter( ))
 				local tracedata = {}
 				tracedata.start = mypos
 				tracedata.endpos = theirpos
-				tracedata.filter = self.Entity
+				tracedata.filter = self
 				local trace = util.TraceLine(tracedata)
-				if (trace.HitNonWorld && trace.Entity && trace.Entity == v) then
+				if (trace.HitNonWorld && IsValid(trace.Entity) && trace.Entity == v) then
 					close = true	
 				end						
 			end
@@ -60,12 +60,13 @@ function ENT:Think()
 	end
 	
 	if self.active then
+		local phys = self:GetPhysicsObject()
+
 		if not self.triggered then
 			if close then --triggered
 				self.triggered = true
 				self:SetColor(255,0,0,255)
 				self:SetPos(self:GetPos() + Vector(0,0,5))
-				phys = self:GetPhysicsObject()
 				
 				if IsValid(phys) then 
 					phys:EnableGravity(false)
@@ -90,7 +91,7 @@ function ENT:Think()
 				if self.explodewatch < CurTime() then
 					self.Entity:StopSound("ambient/creatures/teddy.wav")
 					
-					explode = ents.Create( "env_explosion" ) //creates the explosion
+					local explode = ents.Create( "env_explosion" ) //creates the explosion
 					explode:SetPos(self:GetPos()  )
 					//explode:SetOwner( self.owner ) // this sets you as the person who made the explosion
 					explode:Spawn() //this actually spawns the explosion
