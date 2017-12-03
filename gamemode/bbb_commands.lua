@@ -53,7 +53,7 @@ function jim_follow(ply,command,arg)
 	end
 	
 	local ent = ents.Create( "jim_follow" )
-	if ( !ent:IsValid() ) then return end
+	if ( !IsValid(ent) ) then return end
 	ent:SetPos( ply:EyePos() )
 	ent:SetAngles(ply:EyeAngles())
 	ent:Spawn()
@@ -102,7 +102,7 @@ function jim_c4(ply,command,arg)
 	ent:Activate()
 	
 	local entphys = ent:GetPhysicsObject();
-	if entphys:IsValid() then
+	if IsValid(entphys) then
 		//entphys:EnableMotion(false);
 		entphys:Sleep()
 	end
@@ -180,7 +180,7 @@ if (!IsTTTAdmin(ply)) then return end
 			ent:SetFlexWeight(i,math.random(0,10)/10)
 		end
 	end
-	if (ent:GetPhysicsObject():IsValid()) then ent:GetPhysicsObject():SetMass(1999999) end
+	if (IsValid(ent:GetPhysicsObject())) then ent:GetPhysicsObject():SetMass(1999999) end
    return true;
 end
 concommand.Add("jim_hitler", jim_hitler)
@@ -228,7 +228,7 @@ function jim_baby(ply,command,arg)
 	
 	local mdl = "models/props_c17/doll01.mdl"
 	local ent = ents.Create( "jim_megacustom" )
-	if ( !ent:IsValid() ) then return end
+	if ( !IsValid(ent) ) then return end
 	ent:SetPos( ply:EyePos() )
 	ent:SetAngles(ply:EyeAngles())
 	ent:DoSetModel( mdl)
@@ -249,7 +249,7 @@ function jim_cat(ply,command,arg)
 	
 	local mdl = "models/alyx.mdl"
 	local ent = ents.Create( "jim_megacustom" )
-	if ( !ent:IsValid() ) then return end
+	if ( !IsValid(ent) ) then return end
 	ent:SetPos( ply:EyePos() )
 	ent:SetAngles(ply:EyeAngles())
 	ent:DoSetModel("models/feline.mdl")
@@ -270,7 +270,7 @@ function jim_chimney(ply,command,arg)
 	
 	local mdl = "models/props_animated_breakable/smokestack.mdl"
 	local ent = ents.Create( "jim_megacustom" )
-	if ( !ent:IsValid() ) then return end
+	if ( !IsValid(ent) ) then return end
 	ent:SetPos( ply:EyePos() )
 	ent:SetAngles(ply:EyeAngles())
 	ent:DoSetModel(mdl)
@@ -380,7 +380,7 @@ function jim_ent(ply,command,arg)
 		
 		if (arg[1] == "bouncer") then
 			local ent = ents.Create( entlist[arg[1]] )
-			if ( !ent:IsValid() ) then return end
+			if ( !IsValid(ent) ) then return end
 			ent:SetPos( trace.HitPos  )
 			ent:SetAngles( trace.HitNormal:Angle() + Angle(90,0,0))
 			ent:Spawn()
@@ -428,7 +428,7 @@ function derg_babby(ply,command,arg)
 	ply:ChatPrint("Spawning dragons baby")
 	
 	local ent = ents.Create( "derg_babby" )
-		if ( !ent:IsValid() ) then return end
+		if ( !IsValid(ent) ) then return end
 		ent:SetPos( trace.HitPos + Vector(0,0,10) )
 		ent:SetAngles(Angle(0,0,0))
 		ent:Spawn()
@@ -457,11 +457,11 @@ function jim_teletarg(ply,command,arg)
 	if (CLIENT || !IsTTTAdmin(ply)) then return end
 
 	if (arg[1] != nil) then
-		trace = util.GetPlayerTrace( ply )
-		traceRes=util.TraceLine(trace)
+		local trace = util.GetPlayerTrace( ply )
+		local traceRes=util.TraceLine(trace)
 		for _, v in pairs(player.GetAll()) do
 			if (string.find(string.lower(v:Nick()), string.lower(arg[1])) != nil) or (arg[1] == "@") then
-				if (ply != nil && ply:IsPlayer()) then ply:ChatPrint("TELEPORTING "..v:Nick().."\n") end
+				if (IsValid(ply) && ply:IsPlayer()) then ply:ChatPrint("TELEPORTING "..v:Nick().."\n") end
 				v:SetPos(traceRes.HitPos+Vector(0,0,10))
 			end
 		end
@@ -551,7 +551,7 @@ function rock(ply,command,arg)
 if (!IsTTTAdmin(ply)) then return end
 
 	local ent = ents.Create( "jim_rocket" )
-	if ( !ent:IsValid() ) then return end
+	if ( !IsValid(ent) ) then return end
 	 
 	ent:SetPos( ply:EyePos() )
 	ent:SetAngles(ply:EyeAngles())
@@ -567,7 +567,7 @@ if (!IsTTTAdmin(ply)) then return end
 	local i = 0;
 		while i < 50 do
 			local dildo = ents.Create("prop_physics")
-			if not ValidEntity(dildo) then return nil end
+			if not IsValid(dildo) then return nil end
 
 			dildo:SetPos(ply:GetPos()+Vector(0,0,32))
 			dildo:SetModel("models/jaanus/dildo.mdl")
@@ -589,7 +589,7 @@ function dick(ply,command,arg)
 if (!IsTTTAdmin(ply)) then return end
 
 	local ent = ents.Create( "jim_dick" )
-	if ( !ent:IsValid() ) then return end
+	if ( !IsValid(ent) ) then return end
 	 
 	ent:SetPos( ply:EyePos() )
 	ent:SetAngles(ply:EyeAngles())
@@ -648,7 +648,7 @@ function barrelme(ply,command,arg)
 		ply:SetModel("models/props_c17/oildrum001.mdl");
 		ply:SetNWBool("jim_barrel",true);
 	else
-		Msg("disable barrel")
+		Msg("disable barrel\n")
 		ply:DrawWorldModel(true)
 		if (ply.originalModel) then ply:SetModel(ply.originalModel) end
 		ply:SetNWBool("jim_barrel",false);
@@ -695,7 +695,7 @@ if (!IsTTTAdmin(ply)) then return end
 	end
 	
 	local ent = ents.Create( "prop_ragdoll" )
-	if ( !ent:IsValid() ) then return end
+	if ( !IsValid(ent) ) then return end
 	ent:SetPos( ply:GetPos() )
 	ent:SetAngles(ply:EyeAngles())
 	if (arg[1] == "1") then
@@ -721,7 +721,7 @@ if (!IsTTTAdmin(ply)) then return end
 			ent:SetFlexWeight(i,math.random(0,10)/10)
 		end
 	end
-	if (ent:GetPhysicsObject():IsValid()) then ent:GetPhysicsObject():SetMass(1999999) end
+	if (IsValid(ent:GetPhysicsObject())) then ent:GetPhysicsObject():SetMass(1999999) end
    return true;
 end
 concommand.Add("jim_rag", rag)
@@ -757,7 +757,7 @@ function propspawn(ply,command,arg)
 		local trace = ply:GetEyeTrace()
 		
 		local ent = ents.Create( "prop_physics" )
-		if ( !ent:IsValid() ) then return end
+		if ( !IsValid(ent) ) then return end
 		ent:SetPos( trace.HitPos + Vector(0,0,10) )
 		ent:SetAngles(Angle(0,0,0))
 		ent:SetModel(proplist[arg[1]])
