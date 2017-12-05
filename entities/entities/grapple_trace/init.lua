@@ -16,9 +16,9 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
-	local Owner = self.Entity:GetOwner()
+	local Owner = self:GetOwner()
 	if (Owner && IsValid(Owner) && Owner:GetActiveWeapon():GetClass() != "weapon_ttt_donator_grapple") then
-		self.Entity:Remove();
+		self:Remove();
 	end
 end
 

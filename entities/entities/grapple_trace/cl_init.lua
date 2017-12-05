@@ -16,7 +16,7 @@ local matBeam		 		= Material( "cable/rope" )
 function ENT:Initialize()		
 
 	self.Size = 0
-	self.MainStart = self.Entity:GetPos()
+	self.MainStart = self:GetPos()
 	self.MainEnd = self:GetEndPos()
 	self.dAng = (self.MainEnd - self.MainStart):Angle()
 	//Changed from 3000 to match hook speed.
@@ -29,7 +29,7 @@ end
 
 function ENT:Think()
 
-	self.Entity:SetRenderBoundsWS( self:GetEndPos(), self.Entity:GetPos(), Vector()*8 )
+	self:SetRenderBoundsWS( self:GetEndPos(), self.Entity:GetPos(), Vector()*8 )
 	
 	self.Size = math.Approach( self.Size, 1, 10*FrameTime() )
 	
@@ -85,7 +85,7 @@ function ENT:Draw()
 	// If we're viewing another player we start at their weapon
 	
 		local vm = Owner:GetActiveWeapon()
-		if (!vm || vm == NULL) then return end
+		if (!IsValid(vm)) then return end
 		local attachment = vm:GetAttachment( 1 )
 		if (!attachment || !attachment.Pos) then return end
 		StartPos = attachment.Pos

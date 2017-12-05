@@ -4,7 +4,7 @@ ENT.Type = "anim"
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 ENT.PrintName = "Rocket"
 ENT.Spawnable = false
-ENT.AdminSpawnable = false
+ENT.AdminOnly = false
 ENT.Done = false
 ENT.Effect = false
 ENT.DieTime = false
@@ -32,7 +32,7 @@ function ENT:Think()
 			local smokeparticles = {
 				  Model("jim/meat")
 			   };
-			local center = self.Entity:GetPos()
+			local center = self:GetPos()
 			local em = ParticleEmitter(center)
 			  for i=1, 150 do
 				 local p = em:Add(table.Random(smokeparticles), center )

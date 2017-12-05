@@ -4,7 +4,7 @@ ENT.Type = "anim"
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 ENT.PrintName = "Dick"
 ENT.Spawnable = false
-ENT.AdminSpawnable = false
+ENT.AdminOnly = false
 ENT.Attached = false;
 ENT.KillTime = false;
 function ENT:Draw()
@@ -29,7 +29,7 @@ function ENT:Initialize()
 	phys:Wake()
 	end
 	
-	self.trail = util.SpriteTrail(self.Entity, 0, Color(140,100,50), false, 6, 0, 0.3, 1, "trails/smoke.vmt")	
+	self.trail = util.SpriteTrail(self, 0, Color(140,100,50), false, 6, 0, 0.3, 1, "trails/smoke.vmt")	
 end
 
 function ENT:OnRemove()
@@ -49,6 +49,9 @@ function ENT:PhysicsCollide( data, phys )
 	
 	local hitEnt = data.HitEntity
 	local hitObj = data.HitEntity
+
+	if (!IsValid(hitEnt)) then return end
+
 	if (hitEnt:IsWorld()) then
 		phys:EnableMotion(false);
 		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
@@ -59,15 +62,15 @@ function ENT:PhysicsCollide( data, phys )
 	end
 	
 	if (hitEnt:IsPlayer()) then
-		local hp = hitEnt:Health();
-		if (hp > 30) then hitEnt:SetHealth(hitEnt:Health()-30) else hitEnt:Kill() end
 		self:EmitSound("Flesh.BulletImpact");
 		self:EmitSound("Flesh_Bloody.ImpactHard");
-	else
-		hitEnt:SetHealth(hitEnt:Health()-30)
 	end
-	
-	
+
+	local dmg = DamageInfo()
+	dmg:SetDamage(30)
+	dmg:SetInflictor(self)
+	hitEnt:TakeDamageInfo(dmg)
+
 	phys:EnableMotion(false);
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 	self:SetNoDraw( true )

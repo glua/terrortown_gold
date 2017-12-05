@@ -12,8 +12,8 @@ ENT.SoundName = ")cunt/onlymelon.wav"
 function ENT:PhysicsSetup()	
 	local radius = self.BaseSize*self:GetNetScale();
 	
-	self.Entity:PhysicsInitBox(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
-	self.Entity:SetCollisionBounds(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
+	self:PhysicsInitBox(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
+	self:SetCollisionBounds(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
 end
 
 function ENT:Think()
@@ -21,20 +21,20 @@ function ENT:Think()
 	if (self:GetResized()) then
 		self:SetResized(false)
 		
-		local radius = self.BaseSize*self:GetNetScale();		
+		local radius = self.BaseSize*self:GetNetScale();
 		local curVel = Vector(0,0,0)
 		local angVel = Vector(0,0,0)
 		
-		local entphys = self.Entity:GetPhysicsObject();
+		local entphys = self:GetPhysicsObject();
 		if entphys:IsValid() then
 			curVel = entphys:GetVelocity()
 			angVel = entphys:GetAngleVelocity()
 		end
 
-		self.Entity:PhysicsInitBox(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
-		self.Entity:SetCollisionBounds(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
+		self:PhysicsInitBox(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
+		self:SetCollisionBounds(Vector(-radius,-radius,-radius),Vector(radius,radius,radius))
 		
-		local entphys = self.Entity:GetPhysicsObject();
+		local entphys = self:GetPhysicsObject();
 		if entphys:IsValid() then
 			entphys:Wake()
 			entphys:SetVelocity(curVel)
@@ -47,15 +47,15 @@ end
 
 function ENT:Initialize()
 
-	self.Entity:DrawShadow( false )
-	self.Entity:SetModel("models/props_junk/wood_crate001a.mdl")
-	self.Entity:SetNetScale(1)
-	self.Entity:PhysicsSetup()
-	local entphys = self.Entity:GetPhysicsObject();
+	self:DrawShadow( false )
+	self:SetModel("models/props_junk/wood_crate001a.mdl")
+	self:SetNetScale(1)
+	self:PhysicsSetup()
+	local entphys = self:GetPhysicsObject();
 	if entphys:IsValid() then
 		entphys:SetMass(10000)
 	end
-	self.SoundPatch = CreateSound(self.Entity, self.SoundName );
+	self.SoundPatch = CreateSound(self, self.SoundName );
 	
 end
 
@@ -89,13 +89,13 @@ if (pitch < 1) then
 	return
 end
 
-	self.Entity:EmitSound( self.SoundName, self.SoundVol, 100)
+	self:EmitSound( self.SoundName, self.SoundVol, 100)
 	//self.SoundPatch:Stop()
 	//self.SoundPatch:PlayEx(1,100)*/
 end
 
 function ENT:PhysicsCollide( data, physobj )
-	local sOwner = self.Entity:GetNWEntity("spec_owner");
+	local sOwner = self:GetNWEntity("spec_owner");
 	
 	if (!sOwner || !IsValid(sOwner) || !IsTTTAdmin(sOwner) || !sOwner:KeyDown( IN_SPEED )) then return end
 	
@@ -127,7 +127,7 @@ function ENT:PhysicsCollide( data, physobj )
 		bloodeffect:Fire( "Start", "", 0 )
 		bloodeffect:Fire( "Kill", "", 1.0 )
 		data.HitEntity:Remove()
-		local phy = self.Entity:GetPhysicsObject()
+		local phy = self:GetPhysicsObject()
 		if (phy:IsValid()) then phy:SetVelocity(data.OurOldVelocity) end
 	end
 end

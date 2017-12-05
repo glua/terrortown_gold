@@ -5,8 +5,8 @@ ENT.Type = "anim"
 ---------------------------------------------------------*/
 function ENT:SetEndPos( endpos )
 
-	self.Entity:SetNetworkedVector( 0, endpos )	
-	self.Entity:SetCollisionBoundsWS( self.Entity:GetPos(), endpos, Vector() * 0.25 )
+	self:GetNWVector( 0, endpos )	
+	self:SetCollisionBoundsWS( self:GetPos(), endpos, Vector() * 0.25 )
 	
 end
 
@@ -14,5 +14,5 @@ end
 /*---------------------------------------------------------
 ---------------------------------------------------------*/
 function ENT:GetEndPos()
-	return self.Entity:GetNetworkedVector( 0 )
+	return self:GetNWVector( 0 )
 end

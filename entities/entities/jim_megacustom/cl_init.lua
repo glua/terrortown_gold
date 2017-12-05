@@ -9,10 +9,14 @@ function ENT:Draw()
 	self.CurScale = destScale
 	local curScale = self.CurScale;
 	
-	self.Entity:SetModelScale( Vector(curScale,curScale,curScale) )	
+	local mat = Matrix()
+    mat:Scale(Vector(curScale, curScale, curScale))
+
+	self:EnableMatrix("RenderMultiply", mat)
+
 	local sizeMin = self:GetBaseMin()
 	local sizeMax = self:GetBaseMax()
-	if (sizeMin && sizeMax) then self.Entity:SetRenderBounds(sizeMin,sizeMax) end
+	if (sizeMin && sizeMax) then self:SetRenderBounds(sizeMin,sizeMax) end
 	
 	
 	if (self:GetNWEntity("spec_owner") == LocalPlayer()) then 
@@ -21,11 +25,11 @@ function ENT:Draw()
 		self:SetColor(255, 255, 255, 255)
 	end
 	
-	self.Entity:DrawModel()
+	self:DrawModel()
 	
-	if (IsTTTAdmin(LocalPlayer()) && self.Entity:GetNWEntity("spec_owner") == NULL) then
+	if (IsTTTAdmin(LocalPlayer()) && self:GetNWEntity("spec_owner") == NULL) then
 		render.SetMaterial( Material("jim/melon") )
-		render.DrawSprite( self.Entity:GetPos(), 32, 32, white)
+		render.DrawSprite( self:GetPos(), 32, 32, white)
 	end
 	
 	

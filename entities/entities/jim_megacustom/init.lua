@@ -17,8 +17,8 @@ ENT.BaseSizeMax = false
 function ENT:PhysicsSetup()	
 	local scalemin = self.BaseSizeMin*self:GetNetScale();
 	local scalemax = self.BaseSizeMax*self:GetNetScale();
-	self.Entity:PhysicsInitBox(scalemin,scalemax)
-	self.Entity:SetCollisionBounds(scalemin,scalemax)
+	self:PhysicsInitBox(scalemin,scalemax)
+	self:SetCollisionBounds(scalemin,scalemax)
 end
 
 function ENT:Think()
@@ -30,8 +30,8 @@ function ENT:Think()
 		
 		self:SetNetScale(1)
 		
-		self.Entity:PhysicsSetup()
-		local entphys = self.Entity:GetPhysicsObject();
+		self:PhysicsSetup()
+		local entphys = self:GetPhysicsObject();
 		if entphys:IsValid() then
 			entphys:SetMass(10000)
 		end	
@@ -58,17 +58,17 @@ function ENT:Think()
 		
 		local curVel = Vector(0,0,0)
 		local angVel = Vector(0,0,0)		
-		local curAng = self.Entity:GetAngles()	
-		local entphys = self.Entity:GetPhysicsObject();
+		local curAng = self:GetAngles()	
+		local entphys = self:GetPhysicsObject();
 		if entphys:IsValid() then
 			curVel = entphys:GetVelocity()
 			angVel = entphys:GetAngleVelocity()
 		end
 
-		self.Entity:PhysicsInitBox(scalemin,scalemax)
-		self.Entity:SetCollisionBounds(scalemin,scalemax)
+		self:PhysicsInitBox(scalemin,scalemax)
+		self:SetCollisionBounds(scalemin,scalemax)
 		
-		local entphys = self.Entity:GetPhysicsObject();
+		local entphys = self:GetPhysicsObject();
 		if entphys:IsValid() then
 			entphys:Wake()
 			entphys:SetVelocity(curVel)
@@ -76,13 +76,13 @@ function ENT:Think()
 			
 			entphys:SetMass(10000)
 		end		
-		self.Entity:SetAngles(curAng)
+		self:SetAngles(curAng)
 	end
 end
 
 function ENT:Initialize()
 	self:SetResized(true)
-	self.Entity:DrawShadow( false )
+	self:DrawShadow( false )
 end
 
 function ENT:DoSetModel(model)
@@ -121,13 +121,13 @@ if (pitch < 1) then
 	return
 end
 
-	self.Entity:EmitSound( self.SoundName, self.SoundVol, 100)
+	self:EmitSound( self.SoundName, self.SoundVol, 100)
 	//self.SoundPatch:Stop()
 	//self.SoundPatch:PlayEx(1,100)
 end
 
 function ENT:PhysicsCollide( data, physobj )
-	local sOwner = self.Entity:GetNWEntity("spec_owner");
+	local sOwner = self:GetNWEntity("spec_owner");
 	
 	if (!sOwner || !IsValid(sOwner) || !IsTTTAdmin(sOwner) || !sOwner:KeyDown( IN_SPEED )) then return end
 	
@@ -159,7 +159,7 @@ function ENT:PhysicsCollide( data, physobj )
 		bloodeffect:Fire( "Start", "", 0 )
 		bloodeffect:Fire( "Kill", "", 1.0 )
 		data.HitEntity:Remove()
-		local phy = self.Entity:GetPhysicsObject()
+		local phy = self:GetPhysicsObject()
 		if (phy:IsValid()) then phy:SetVelocity(data.OurOldVelocity) end
 	end
 end

@@ -4,7 +4,7 @@ ENT.Type = "anim"
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 ENT.PrintName = "Chaser."
 ENT.Spawnable = false
-ENT.AdminSpawnable = false
+ENT.AdminOnly = false
  
 if (CLIENT) then
 	local Laser = Material( "cable/redlaser" )
@@ -12,8 +12,12 @@ end
 
 function ENT:Draw()
     self:DrawModel()
-	
-	self:SetModelScale(Vector(3,3,2+(math.sin(CurTime()*self.wobbleSpeed)/2)))
+
+    local scale = Vector(3,3,2+(math.sin(CurTime()*self.wobbleSpeed)/2))
+    local mat = Matrix()
+    mat:Scale(scale)
+
+	self:EnableMatrix("RenderMultiply", mat)
 	
 	local Vector1 = self:LocalToWorld( Vector( 10240, 0, 0 ) )
 	local Vector2 = self:LocalToWorld( Vector( 0, 0, 0)  )
@@ -45,7 +49,6 @@ function ENT:Initialize()
 		local maxRender = Vector(8000, 32, 32)
 		
 		self:SetRenderBounds(minRender, maxRender)
-		self.Entity:SetRenderBounds(minRender, maxRender)
 	end
 	
 end
@@ -68,7 +71,7 @@ function ENT:UpdateTargets()
 	
 	local closestPlayer = NULL
 	local closestDist = -1;
-	local myPos = self.Entity:GetPos()
+	local myPos = self:GetPos()
 	
 	for k, v in pairs(player.GetAll()) do
 		if (IsValid(v) and v:IsPlayer() and !v:IsSpec()) then
@@ -96,7 +99,7 @@ function ENT:Think()
 	if (self.LastUpdateCheck < CurTime()) then
 		
 		if (!self:UpdateTargets()) then 
-			self.Entity:Remove()
+			self:Remove()
 			return
 		end
 		
@@ -104,30 +107,30 @@ function ENT:Think()
 	end
 	
 	if (self.Target == nil || !IsValid(self.Target) || self.Target:IsSpec()) then 
-		self.Entity:Remove()
+		self:Remove()
 		return
 	end
 	
-	self.Entity:SetAngles( ( (self.Target:EyePos()+Vector(self.offsetX,self.offsetY,self.offsetZ)) - self.Entity:GetPos() ):Angle() )  //Point at our target.
+	self:SetAngles( ( (self.Target:EyePos()+Vector(self.offsetX,self.offsetY,self.offsetZ)) - self:GetPos() ):Angle() )  //Point at our target.
 
-	local dist = self.Entity:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))
+	local dist = self:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))
 	if (dist > 150) then
-		self.Entity:SetPos(self.Entity:GetPos() + (self.Entity:GetForward()*4.5))
+		self:SetPos(self:GetPos() + (self:GetForward()*4.5))
 	end
 
 	if (self.LastSound == -1 or self.LastSound < CurTime()) then
 		local pitch = 50
 		
-		local dist = self.Entity:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))			
+		local dist = self:GetPos():Distance(self.Target:GetPos()+Vector(0,0,64))			
 		pitch = 150-(dist/14)
 		//self.LastSound = CurTime() + (dist/100)*0.1
 		self.LastSound = CurTime() + (math.random(8,20)/10)
 		if (dist < 160) then
-			self.Entity:EmitSound("cunt/onlymelon.wav",60,self.pitch)
+			self:EmitSound("cunt/onlymelon.wav",60,self.pitch)
 		end
 	end
 	
-	self.Entity:NextThink(CurTime())
+	self:NextThink(CurTime())
 	return true
 end
 
